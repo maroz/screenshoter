@@ -11,7 +11,7 @@ on:
 jobs:
   run_tests:
     name: Run Automation Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -19,11 +19,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13.5'
+          python-version: "3.13.5"
+          cache: "pip"
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+          sudo apt update
+          sudo apt install -y ffmpeg default-jre-headless
           wget -O allure_2.34.0-1_all.deb https://github.com/allure-framework/allure2/releases/download/2.34.0/allure_2.34.0-1_all.deb
-          dpkg -i allure_2.34.0-1_all.deb
+          sudo dpkg -i allure_2.34.0-1_all.deb
           allure --version
-          apt install -y ffmpeg
