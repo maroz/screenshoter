@@ -1,0 +1,29 @@
+name: CI Workflow to Test Video Stream Screenshot Capture endpoint
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  run_tests:
+    name: Run Automation Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.5'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          wget -O allure_2.34.0-1_all.deb https://github.com/allure-framework/allure2/releases/download/2.34.0/allure_2.34.0-1_all.deb
+          dpkg -i allure_2.34.0-1_all.deb
+          allure --version
+          apt install -y ffmpeg
