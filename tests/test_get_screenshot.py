@@ -1,18 +1,24 @@
 import allure
+import json
 import pytest
 import re
 
 from flask import url_for
 
 
-def _attach_screenshot(response):
-    content = response.data
-    filename = re.search(pattern=fr"filename=(?P<filename>.*\.png)",
-                         string=response.headers["Content-Disposition"]).group("filename")
-    if content:
-        allure.attach(content,
-                      name=filename,
-                      attachment_type=allure.attachment_type.PNG)
+def _attach_response(response):
+    if response.status_code == 200:
+        filename = re.search(pattern=fr"filename=(?P<filename>.*\.png)",
+                             string=response.headers["Content-Disposition"]).group("filename")
+        content = response.data
+        if content:
+            allure.attach(content,
+                          name=filename,
+                          attachment_type=allure.attachment_type.PNG)
+    else:
+        allure.attach(json.dumps(response.json, indent=2),
+                      name="Error Response",
+                      attachment_type=allure.attachment_type.JSON)
 
 
 @pytest.mark.usefixtures("start_stream")
@@ -44,12 +50,11 @@ def test_get_screenshot(client, video_stream_host, video_stream_port):
         response = client.get(url_for("screenshot_api.get_screenshot",
                                       port=video_stream_port,
                                       host=video_stream_host))
+        _attach_response(response=response)
 
     with allure.step(f"Verify response status code ({expected_status_code})"):
         assert response.status_code == expected_status_code, \
             f"Expected status code {expected_status_code}, but got {response.status_code}"
-
-    _attach_screenshot(response=response)
 
     with allure.step(f"Verify response content type ({expected_mimetype})"):
         assert response.mimetype == expected_mimetype, \
@@ -86,9 +91,9 @@ def test_get_multiple_screenshots(client, video_stream_host, video_stream_port):
                 response = client.get(url_for("screenshot_api.get_screenshot",
                                               port=video_stream_port,
                                               host=video_stream_host))
+                _attach_response(response=response)
                 assert response.status_code == 200, \
                     f"Failed to retrieve screenshot #{i + 1}, status code: {response.status_code}"
-                _attach_screenshot(response=response)
                 captured_screenshots.add(response.data)
 
     with allure.step("Verify that all screenshots are unique"):
@@ -121,6 +126,8 @@ def test_get_screenshot_from_non_existing_stream(client, video_stream_host, vide
         response = client.get(url_for("screenshot_api.get_screenshot",
                                       port=video_stream_port,
                                       host=video_stream_host))
+        _attach_response(response=response)
+
 
     with allure.step(f"Verify the response status code ({expected_status_code})"):
         assert response.status_code == expected_status_code, \
@@ -146,6 +153,7 @@ def test_get_screenshot_invalid_port(client, video_stream_host):
         response = client.get(url_for("screenshot_api.get_screenshot",
                                        port="invalid",
                                        host=video_stream_host))
+        _attach_response(response=response)
 
     with allure.step(f"Verify the response status code ({expected_status_code})"):
         assert response.status_code == expected_status_code, \

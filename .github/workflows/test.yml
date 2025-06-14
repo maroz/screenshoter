@@ -1,4 +1,4 @@
-name: CI Workflow to Test Video Stream Screenshot Capture endpoint
+name: Run Automation Tests
 
 on:
   push:
@@ -25,7 +25,30 @@ jobs:
         run: |
           pip install -r requirements.txt
           sudo apt update
-          sudo apt install -y ffmpeg default-jre-headless
+          sudo apt install -y ffmpeg default-jre-headless libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
+            gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x \
+            gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
           wget -O allure_2.34.0-1_all.deb https://github.com/allure-framework/allure2/releases/download/2.34.0/allure_2.34.0-1_all.deb
           sudo dpkg -i allure_2.34.0-1_all.deb
           allure --version
+      - name: Run tests
+        run: |
+          python -m pytest -vv --junitxml=report.xml tests/
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: success() || failure()
+        with:
+          report_paths: report.xml
+      - name: Generate Allure Report
+        if: success() || failure()
+        run: |
+          allure generate --clean -o allure-report --single-file
+          mv allure-report/index.html allure-report/report.html
+      - name: Upload Allure Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/report.html
