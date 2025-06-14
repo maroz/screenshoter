@@ -1,4 +1,4 @@
-name: CI Workflow to Test Video Stream Screenshot Capture endpoint
+name: Run Automation Tests
 
 on:
   push:
@@ -29,3 +29,20 @@ jobs:
           wget -O allure_2.34.0-1_all.deb https://github.com/allure-framework/allure2/releases/download/2.34.0/allure_2.34.0-1_all.deb
           sudo dpkg -i allure_2.34.0-1_all.deb
           allure --version
+      - name: Run tests
+        run: |
+          python -m pytest --junitxml=report.xml tests/
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: success() || failure()
+        with:
+          report_paths: junit-report/report.xml
+      - name: Generate Allure Report
+        run: |
+          allure generate --clean -o allure-report --single-file
+          mv allure-report/index.html allure-report/report.html
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/report.html
