@@ -19,5 +19,5 @@ def get_screenshot(host: str = "127.0.0.1", port: int = 5600):
     return Response(
         image_bytes,
         media_type="image/png",
-        headers={"Content-Disposition": f"attachment;filename={filename}"}
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
