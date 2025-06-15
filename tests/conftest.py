@@ -7,7 +7,7 @@ from utils.video_stream_helper import stream_helper
 
 
 @pytest.fixture()
-def client(request):
+def client():
     with TestClient(app) as client:
         yield client
 
