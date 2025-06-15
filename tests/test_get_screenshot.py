@@ -4,6 +4,14 @@ import pytest
 import re
 
 
+@allure.step("Capture screenshot from video stream (host={host}, port={port})")
+def capture_and_attach(client, host, port):
+    response = client.get("/screenshot", params={"host": host, "port": port})
+    _attach_response(response)
+    assert response.status_code == 200
+    return response
+
+
 def _attach_response(response):
     if response.status_code == 200:
         filename = re.search(pattern=fr"filename=(?P<filename>.*\.png)",
@@ -87,12 +95,7 @@ def test_get_multiple_screenshots(client, video_stream_host, video_stream_port):
     with allure.step(f"Retrieve {expected_screenshots_number} screenshots from the video stream"):
         for i in range(expected_screenshots_number):
             with allure.step(f"Retrieve screenshot #{i + 1}"):
-                response = client.get("/screenshot",
-                                      params={"port": video_stream_port,
-                                              "host": video_stream_host})
-                _attach_response(response=response)
-                assert response.status_code == 200, \
-                    f"Failed to retrieve screenshot #{i + 1}, status code: {response.status_code}"
+                response = capture_and_attach(client, host=video_stream_host, port=video_stream_port)
                 captured_screenshots.add(response.content)
 
     with allure.step("Verify that all screenshots are unique"):
