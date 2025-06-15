@@ -8,7 +8,7 @@ A Python project for capturing screenshots from the videostream
 - Capture screenshots from the video stream
 
 ## Requirements
-- Python 3.13
+- Python 3.13+
 
 ## Installation
 Install system dependencies:
@@ -36,7 +36,7 @@ $ sudo dpkg -i allure_2.34.0-1_all.deb
 ## Usage
 Run the application:
 ```bash
-$ python app.py
+$ fastapi run app.py --port 8080
 ```
 
 ## Testing
