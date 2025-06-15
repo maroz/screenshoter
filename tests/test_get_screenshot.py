@@ -28,7 +28,7 @@ def test_get_screenshot(client, video_stream_host, video_stream_port):
     Test case to verify that a screenshot can be retrieved from an existing video stream.
 
     [Preconditions]
-    1. Vi.deo stream is running on {video_stream_host} host and {video_stream_port} port.
+    1. Video stream is running on {video_stream_host} host and {video_stream_port} port.
 
     [Steps]
     1. Send a GET request to the screenshot endpoint with the video stream host and port.
@@ -45,7 +45,7 @@ def test_get_screenshot(client, video_stream_host, video_stream_port):
     allure.dynamic.description(description)
 
     with allure.step("Retrieve a screenshot from the video stream"):
-        response = client.get("/screenshot/",
+        response = client.get("/screenshot",
                               params={"port": video_stream_port,
                                       "host": video_stream_host})
         _attach_response(response=response)
@@ -87,7 +87,7 @@ def test_get_multiple_screenshots(client, video_stream_host, video_stream_port):
     with allure.step(f"Retrieve {expected_screenshots_number} screenshots from the video stream"):
         for i in range(expected_screenshots_number):
             with allure.step(f"Retrieve screenshot #{i + 1}"):
-                response = client.get("/screenshot/",
+                response = client.get("/screenshot",
                                       params={"port": video_stream_port,
                                               "host": video_stream_host})
                 _attach_response(response=response)
@@ -122,7 +122,7 @@ def test_get_screenshot_from_non_existing_stream(client, video_stream_host, vide
     allure.dynamic.description(description)
 
     with allure.step("Retrieve a screenshot from a non-existing video stream"):
-        response = client.get("/screenshot/",
+        response = client.get("/screenshot",
                               params={"port": video_stream_port,
                                       "host": video_stream_host})
         _attach_response(response=response)
@@ -149,7 +149,7 @@ def test_get_screenshot_invalid_port(client, video_stream_host):
     allure.dynamic.description(description)
 
     with allure.step("Retrieve a screenshot with an invalid port"):
-        response = client.get("/screenshot/",
+        response = client.get("/screenshot",
                               params={"port": "invalid_port",  # Using a non-integer value for port
                                       "host": video_stream_host})
         _attach_response(response=response)
