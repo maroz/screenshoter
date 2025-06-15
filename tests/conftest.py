@@ -1,17 +1,15 @@
 import pytest
 
-from app import create_app
+from app import app
+from fastapi.testclient import TestClient
+
 from utils.video_stream_helper import stream_helper
 
 
-@pytest.fixture
-def app():
-    return create_app()
-
-
 @pytest.fixture()
-def client(app):
-    return app.test_client()
+def client():
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture()

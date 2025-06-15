@@ -1,5 +1,6 @@
 allure-pytest
-Flask
-flasgger
 pytest
-pytest-flask
+fastapi
+jinja2
+python-multipart
+httpx
