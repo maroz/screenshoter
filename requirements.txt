@@ -3,3 +3,4 @@ pytest
 fastapi
 jinja2
 python-multipart
+httpx
