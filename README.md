@@ -1,6 +1,6 @@
 # screenshoter
 
-A Python project for capturing screenshots from the videostream automatically
+A Python project for capturing screenshots from the videostream
 
 ## Features
 
